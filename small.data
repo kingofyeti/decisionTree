@@ -1,0 +1,10 @@
+p,x,s,n,t,p,f,c,n
+e,x,s,y,t,a,f,c,b
+e,b,s,w,t,l,f,c,b
+p,x,y,w,t,p,f,c,n
+e,x,s,g,f,n,f,w,b
+e,x,y,y,t,a,f,c,b
+e,b,s,w,t,a,f,c,b
+e,b,y,w,t,l,f,c,b
+p,x,y,w,t,p,f,c,n
+e,b,s,y,t,a,f,c,b
