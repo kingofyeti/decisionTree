@@ -14,18 +14,23 @@
 
 using namespace std;
 
+int maxTreeHeight = 0;
+int nodeNum = 0;
+
 struct TreeNode {
 	vector<vector<char>> table;
 	vector<int> colIndex;
 	vector<shared_ptr<TreeNode>> children;
 	int fatherPartition;
 	char fatherPartitionVal;
+	int curHeight;
 	TreeNode(vector<vector<char>>
 			_table,
 			vector<int>_colIndex,vector<shared_ptr<TreeNode>>
-			_children,int _fatherPartition,char _fatherPartitionVal) :
+			_children,int _fatherPartition,char
+			_fatherPartitionVal,int _curHeight) :
 		table(_table) ,colIndex(_colIndex), children(_children)
-		,fatherPartition(_fatherPartition),fatherPartitionVal(_fatherPartitionVal) {}
+		,fatherPartition(_fatherPartition),fatherPartitionVal(_fatherPartitionVal),curHeight(_curHeight) {}
 };
 
 void printNode(shared_ptr<TreeNode> node){
@@ -42,11 +47,14 @@ void printNode(shared_ptr<TreeNode> node){
 	}
 	cout << endl << "Father partition: " << node->fatherPartition << endl;
 	cout << endl << "Father partition value: " << node->fatherPartitionVal << endl;
+	cout << endl << "Cur height: " << node->curHeight << endl;
 	cout << "========================" << endl;
 }
 
 void partitionNode(shared_ptr<TreeNode> node,int partitionCol){	
 	auto nodeTable = node->table;
+	int curHeight = node->curHeight + 1;
+	maxTreeHeight = max(maxTreeHeight,curHeight);
 	while(nodeTable.size()!=0){
 		char curVal = nodeTable[0][partitionCol];
 		auto newColIndex = node->colIndex;
@@ -64,7 +72,8 @@ void partitionNode(shared_ptr<TreeNode> node,int partitionCol){
 			}	
 		}
 		auto newNode
-			=make_shared<TreeNode>(newTable,newColIndex,newChildren,partitionCol,curVal);
+			=make_shared<TreeNode>(newTable,newColIndex,newChildren,partitionCol,curVal,curHeight);
+		nodeNum ++;	
 		node->children.push_back(newNode);
 	}
 }
@@ -87,7 +96,7 @@ shared_ptr<TreeNode> inputData(){
 	for(int i=0;i<inputTable[0].size();i++){
 		colIndex.push_back(i);	
 	}
-	auto root =make_shared<TreeNode>(inputTable,colIndex,children,-1,'-');
+	auto root =make_shared<TreeNode>(inputTable,colIndex,children,-1,'-',0);
 	return root;
 }
 
@@ -141,12 +150,34 @@ int calPartitionCol(shared_ptr<TreeNode> node){
 	return maxGainCol;
 }
 
-void buildTree(shared_ptr<TreeNode> node){
-				
+bool isPure(shared_ptr<TreeNode> node){
+	if(node->table.size() == 0) return true;
+	if(node->table[0].size() == 2) return true;
+	char sign = node->table[0][0];
+	for(int i=1;i<node->table.size();i++){
+		if(node->table[i][0] != sign )	
+			return false;
+	}
+	return true;
+}
+
+bool buildTree(shared_ptr<TreeNode> node){
+	if(isPure(node))
+		return true;
+	cout << isPure(node) << endl;
+	int partitionCol = calPartitionCol(node);
+	partitionNode(node,partitionCol);
+	for(auto x : node->children){
+		printNode(x);
+		buildTree(x);
+	}
+	return true;
 }
 
 int main(){
 	auto root = inputData();
 	printNode(root);
-	cout << calPartitionCol(root) <<endl;
+	if(buildTree(root))
+	cout << "Tree build finished! " << endl;
+	cout << "Max tree height: " << maxTreeHeight << endl;
 }
